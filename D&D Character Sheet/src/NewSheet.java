@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -54,8 +55,14 @@ public class NewSheet {
 	public NewSheet() throws IOException {
 
 		spells = new TreeMap<String, ArrayList<String>>();
-		FileReader databaseInit = new FileReader(new File(
+		FileReader databaseInit = null;
+		try {
+		databaseInit = new FileReader(new File(
 				"newSpellDatabase.txt"));
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "No database found. Try the readme.", "", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
+		}
 		BufferedReader database = new BufferedReader(databaseInit);
 
 		String read = database.readLine();
@@ -81,16 +88,6 @@ public class NewSheet {
 		database.close();
 		databaseInit.close();
 
-		/*
-		 * FileWriter optimalWriter = new FileWriter(new File(
-		 * "optimizedSpellList.txt")); PrintWriter optimal = new
-		 * PrintWriter(optimalWriter);
-		 * 
-		 * for (String a : spells.keySet()) { optimal.println("******");
-		 * optimal.println(a); for (String b : spells.get(a)) {
-		 * optimal.println(b); } } optimal.close(); optimalWriter.close();
-		 */
-
 		mainWindow = new JFrame("Spell Sheet");
 		mainWindow.setSize(800, 600);
 		mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -104,13 +101,13 @@ public class NewSheet {
 				mainWindow.getHeight() - mainWindow.getInsets().bottom
 						- mainWindow.getInsets().top));
 		contentPane.setLocation(0, 0);
-		//contentPane.setBackground(Color.RED);
+		// contentPane.setBackground(Color.RED);
 
 		menuBar = new JPanel(null);
 		menuBar.setSize(mainWindow.getWidth(), 50);
 		menuBar.setPreferredSize(new Dimension(mainWindow.getWidth(), 50));
 		menuBar.setLocation(0, 0);
-		//menuBar.setBackground(Color.GREEN);
+		// menuBar.setBackground(Color.GREEN);
 
 		scale = 0.5;
 
@@ -133,7 +130,7 @@ public class NewSheet {
 		spellSlots = new JPanel(new GridLayout(3, 9));
 		spellSlots.setSize(600, 50);
 		spellSlots.setLocation(300, 0);
-		//spellSlots.setBackground(Color.MAGENTA);
+		// spellSlots.setBackground(Color.MAGENTA);
 
 		for (int a = 0; a < 9; a++) {
 			JLabel temp = new JLabel(a + 1 + "");
@@ -208,13 +205,13 @@ public class NewSheet {
 			cards.add(new SpellCard(this, r));
 			r = list.readLine();
 		}
-		
+
 		Collections.sort(cards);
-		
-		for(SpellCard a : cards){
+
+		for (SpellCard a : cards) {
 			scrollPanel.add(a);
 		}
-		
+
 		scrollPane.revalidate();
 		scrollPane.repaint();
 		scrollPanel.revalidate();
