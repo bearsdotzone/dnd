@@ -1,19 +1,13 @@
 # dnd
 Obtain a properly formatted database:
 
-******
-
-Spell Name
-
-Everything Else
-
-******
-
-2nd Spell Name
-
-Everything Else
-
-Etc.
+	******
+	Spell Name
+	Everything Else
+	******
+	2nd Spell Name
+	Everything Else
+	Etc.
 
 The DatabaseOrganizer build will allow easy conversion of the community resource folder's spell lists to proper database format.
 
