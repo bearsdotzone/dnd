@@ -1,4 +1,10 @@
 # dnd
+
+The slider is scale of the cards.
+
+Left click max spells to increase, right click to decrease.
+Similarly you can use spells in the same way.
+
 Obtain a properly formatted database:
 
 	******
