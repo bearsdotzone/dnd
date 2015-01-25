@@ -1,5 +1,6 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 
 public class SpellNumberListener implements KeyListener {
@@ -15,7 +16,12 @@ public class SpellNumberListener implements KeyListener {
 			newSheet.textField.setText("0");
 		}
 		newSheet.textField.setText(newSheet.textField.getText().replaceAll("\\D+", ""));
-		newSheet.addSpells();
+		try {
+			newSheet.addSpells();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void keyReleased(KeyEvent arg0) {
@@ -23,7 +29,12 @@ public class SpellNumberListener implements KeyListener {
 			newSheet.textField.setText("0");
 		}
 		newSheet.textField.setText(newSheet.textField.getText().replaceAll("\\D+", ""));
-		newSheet.addSpells();
+		try {
+			newSheet.addSpells();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void keyTyped(KeyEvent arg0) {
@@ -31,7 +42,12 @@ public class SpellNumberListener implements KeyListener {
 			newSheet.textField.setText("0");
 		}
 		newSheet.textField.setText(newSheet.textField.getText().replaceAll("\\D+", ""));
-		newSheet.addSpells();
+		try {
+			newSheet.addSpells();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
