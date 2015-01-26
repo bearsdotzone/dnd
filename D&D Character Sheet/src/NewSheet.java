@@ -17,19 +17,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 public class NewSheet {
@@ -51,6 +56,11 @@ public class NewSheet {
 	public JButton plusButton;
 	public JButton minusButton;
 	public ArrayList<SpellCard> cards;
+	public ArrayList<String> cardTitles;
+	public JPanel spellAdd;
+	public JScrollPane spellPane;
+	public JList<String> spellList;
+	public JButton addButton;
 
 	public NewSheet() throws IOException {
 
@@ -92,7 +102,7 @@ public class NewSheet {
 		databaseInit.close();
 
 		mainWindow = new JFrame("Spell Sheet");
-		mainWindow.setSize(800, 600);
+		mainWindow.setSize(1280, 720);
 		mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
 		mainWindow.setVisible(true);
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,7 +125,7 @@ public class NewSheet {
 		scale = 0.5;
 
 		key = new JPanel(new GridLayout(3, 1));
-		key.setSize(100, 50);
+		key.setSize(75, 50);
 		key.setLocation(200, 0);
 
 		String[] words = { "Level", "Max", "Used" };
@@ -131,8 +141,8 @@ public class NewSheet {
 		maxSlots = new int[9];
 
 		spellSlots = new JPanel(new GridLayout(3, 9));
-		spellSlots.setSize(600, 50);
-		spellSlots.setLocation(300, 0);
+		spellSlots.setSize(425, 50);
+		spellSlots.setLocation(275, 0);
 		// spellSlots.setBackground(Color.MAGENTA);
 
 		for (int a = 0; a < 9; a++) {
@@ -169,7 +179,7 @@ public class NewSheet {
 		characterList = new JComboBox<String>();
 		characterList.setSize(200, 25);
 		characterList.setPreferredSize(new Dimension(200, 25));
-		characterList.setLocation(900, 12);
+		characterList.setLocation(700, 12);
 
 		for (File a : new File("character/").listFiles())
 			characterList.addItem(a.getName().replaceAll(".txt", ""));
@@ -179,7 +189,7 @@ public class NewSheet {
 		minusButton = new JButton("-");
 		minusButton.setSize(40, 40);
 		minusButton.setSize(new Dimension(40, 40));
-		minusButton.setLocation(1100, 5);
+		minusButton.setLocation(900, 5);
 		minusButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
 		minusButton.addActionListener(new CharacterListListener(characterList,
 				true));
@@ -189,7 +199,7 @@ public class NewSheet {
 		plusButton = new JButton("+");
 		plusButton.setSize(40, 40);
 		plusButton.setSize(new Dimension(40, 40));
-		plusButton.setLocation(1140, 5);
+		plusButton.setLocation(940, 5);
 		plusButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
 		plusButton.addActionListener(new CharacterListListener(characterList,
 				false));
@@ -197,7 +207,6 @@ public class NewSheet {
 		menuBar.add(plusButton);
 
 		scrollPanel = new JPanel(new WrapLayout());
-		// scrollPanel.setBackground(Color.CYAN);
 		scrollPanel.setMinimumSize(new Dimension(800, 600));
 
 		scrollPane = new JScrollPane(scrollPanel);
@@ -216,6 +225,49 @@ public class NewSheet {
 
 		contentPane.add(menuBar, BorderLayout.NORTH);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
+
+		spellAdd = new JPanel(null);
+		spellAdd.setSize(300, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top);
+		spellAdd.setPreferredSize(new Dimension(300, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top));
+		spellAdd.setLocation(0, 0);
+
+		spellList = new JList<String>();
+		spellList.setMinimumSize(new Dimension(300, 300));
+		spellList.setLayoutOrientation(JList.VERTICAL);
+		spellList.setVisibleRowCount(-1);
+		spellList.setLocation(0, 0);
+
+		spellPane = new JScrollPane(spellList);
+		spellPane.setSize(300, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
+				- 100);
+		spellPane.setPreferredSize(new Dimension(300, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
+				- 100));
+		spellPane.setLocation(0, 0);
+		spellPane.setBackground(Color.RED);
+
+		DefaultListModel<String> lm = new DefaultListModel<String>();
+		spellList.setModel(lm);
+
+		for (String a : spells.keySet())
+			lm.addElement(a);
+
+		addButton = new JButton("Add Spells");
+		addButton.setSize(300, 50);
+		addButton.setPreferredSize(new Dimension(300, 50));
+		addButton.setLocation(0,
+				mainWindow.getHeight() - mainWindow.getInsets().bottom
+						- mainWindow.getInsets().top - 100);
+		addButton.addActionListener(new ListListener(this));
+
+		spellAdd.add(addButton);
+
+		spellAdd.add(spellPane);
+
+		contentPane.add(spellAdd, BorderLayout.EAST);
 
 		scrollPane.revalidate();
 		scrollPane.repaint();
@@ -270,6 +322,35 @@ public class NewSheet {
 		scrollPanel.revalidate();
 		scrollPanel.repaint();
 		writeSpells(cards);
+	}
+
+	public void addSpellsToList(List<String> list2) throws IOException {
+		FileReader fr = new FileReader(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
+		BufferedReader read = new BufferedReader(fr);
+		ArrayList<String> list = new ArrayList<String>();
+		String q = read.readLine();
+		while (q != null) {
+			list.add(q);
+			q = read.readLine();
+		}
+		read.close();
+		fr.close();
+		for (String a : list2) {
+			cardTitles = new ArrayList<String>();
+			for (SpellCard b : cards) {
+				cardTitles.add(b.title);
+			}
+			if (!cardTitles.contains(a))
+				list.add(a);
+		}
+		FileWriter fw = new FileWriter(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
+		PrintWriter pw = new PrintWriter(fw);
+		for (String a : list)
+			pw.println(a);
+		pw.close();
+		fw.close();
 	}
 
 	public void updateMaxes() throws IOException {

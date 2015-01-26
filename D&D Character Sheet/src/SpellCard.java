@@ -69,7 +69,7 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 				temp.addMouseListener(new CardSpellSlotListener(temp, a,
 						newSheet));
 				temp.setHorizontalAlignment(JLabel.CENTER);
-				temp.setFont(new Font(Font.SANS_SERIF,Font.BOLD,10));
+				temp.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
 				temp.setToolTipText(a + "");
 				footer.add(temp);
 			}
@@ -118,7 +118,10 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 		} else if (compare.level > this.level) {
 			return -1;
 		} else {
-			return 0;
+			if (compare.title.compareTo(this.title) < 0)
+				return 1;
+			else
+				return -1;
 		}
 	}
 }
