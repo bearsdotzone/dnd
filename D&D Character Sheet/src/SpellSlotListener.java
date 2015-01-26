@@ -1,6 +1,7 @@
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
@@ -27,6 +28,8 @@ public class SpellSlotListener implements MouseListener {
 			}
 		}
 		try {
+			if (newSheet.cards == null)
+				newSheet.cards = new ArrayList<SpellCard>();
 			newSheet.writeSpells(newSheet.cards);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

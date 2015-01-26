@@ -14,15 +14,19 @@ public class CharacterListListener implements ActionListener {
 
 	JComboBox<String> characterList;
 	boolean delete;
+	NewSheet newSheet;
 
-	public CharacterListListener(JComboBox<String> characterList, boolean delete) {
+	public CharacterListListener(JComboBox<String> characterList,
+			boolean delete, NewSheet newSheet) {
 		this.characterList = characterList;
 		this.delete = delete;
+		this.newSheet = newSheet;
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 		if (delete) {
-			new File("character/" + characterList.getSelectedItem() + ".txt").delete();
+			new File("character/" + characterList.getSelectedItem() + ".txt")
+					.delete();
 			characterList.removeItem(characterList.getSelectedItem());
 
 		} else {
@@ -43,6 +47,7 @@ public class CharacterListListener implements ActionListener {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			newSheet.updateLists();
 		}
 	}
 }
