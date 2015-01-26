@@ -344,11 +344,17 @@ public class NewSheet {
 			spellAdd.setPreferredSize(new Dimension(300, mainWindow.getHeight()
 					- mainWindow.getInsets().bottom
 					- mainWindow.getInsets().top));
-			spellPane.setSize(300,
+			spellPane.setSize(150,
 					mainWindow.getHeight() - mainWindow.getInsets().bottom
 							- mainWindow.getInsets().top - 50);
-			spellPane.setPreferredSize(new Dimension(300, mainWindow
+			spellPane.setPreferredSize(new Dimension(150, mainWindow
 					.getHeight()
+					- mainWindow.getInsets().bottom
+					- mainWindow.getInsets().top - 50));
+			havePane.setSize(150,
+					mainWindow.getHeight() - mainWindow.getInsets().bottom
+							- mainWindow.getInsets().top - 50);
+			havePane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
 					- mainWindow.getInsets().bottom
 					- mainWindow.getInsets().top - 50));
 		}
