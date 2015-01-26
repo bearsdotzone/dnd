@@ -9,9 +9,11 @@ Obtain a properly formatted database:
 
 	******
 	Spell Name
+	(School) Cantrip
 	Everything Else
 	******
 	2nd Spell Name
+	(x) level (School)
 	Everything Else
 	Etc.
 
