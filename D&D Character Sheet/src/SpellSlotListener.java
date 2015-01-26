@@ -1,7 +1,6 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 
@@ -27,6 +26,12 @@ public class SpellSlotListener implements MouseListener {
 				temp.setText(Integer.parseInt(temp.getText())-1+"");
 				newSheet.maxSlots[index] = Integer.parseInt(temp.getText());
 			}
+		}
+		try {
+			newSheet.writeSpells();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

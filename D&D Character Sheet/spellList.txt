@@ -14,3 +14,4 @@ Mending
 Scorching Ray
 Shocking Grasp
 Thaumaturgy
+Wish

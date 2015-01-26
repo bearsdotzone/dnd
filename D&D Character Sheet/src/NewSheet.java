@@ -1,38 +1,35 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
 public class NewSheet {
@@ -50,17 +47,22 @@ public class NewSheet {
 	public JPanel key;
 	public int[] maxSlots;
 	public TreeMap<String, ArrayList<String>> spells;
-	public JProgressBar load;
+	public JComboBox<String> characterList;
+	public JButton plusButton;
+	public JButton minusButton;
 
 	public NewSheet() throws IOException {
+
+		new File("character").mkdirs();
 
 		spells = new TreeMap<String, ArrayList<String>>();
 		FileReader databaseInit = null;
 		try {
-		databaseInit = new FileReader(new File(
-				"newSpellDatabase.txt"));
+			databaseInit = new FileReader(new File("newSpellDatabase.txt"));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "No database found. Try the readme.", "", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null,
+					"No database found. Try the readme.", "",
+					JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
 		BufferedReader database = new BufferedReader(databaseInit);
@@ -163,6 +165,36 @@ public class NewSheet {
 
 		menuBar.add(slider);
 
+		characterList = new JComboBox<String>();
+		characterList.setSize(200, 25);
+		characterList.setPreferredSize(new Dimension(200, 25));
+		characterList.setLocation(900, 12);
+
+		for (File a : new File("character/").listFiles())
+			characterList.addItem(a.getName().replaceAll(".txt", ""));
+
+		menuBar.add(characterList);
+
+		minusButton = new JButton("-");
+		minusButton.setSize(40, 40);
+		minusButton.setSize(new Dimension(40, 40));
+		minusButton.setLocation(1100, 5);
+		minusButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
+		minusButton.addActionListener(new CharacterListListener(characterList,
+				true));
+
+		menuBar.add(minusButton);
+
+		plusButton = new JButton("+");
+		plusButton.setSize(40, 40);
+		plusButton.setSize(new Dimension(40, 40));
+		plusButton.setLocation(1140, 5);
+		plusButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
+		plusButton.addActionListener(new CharacterListListener(characterList,
+				false));
+
+		menuBar.add(plusButton);
+
 		scrollPanel = new JPanel(new WrapLayout());
 		// scrollPanel.setBackground(Color.CYAN);
 		scrollPanel.setMinimumSize(new Dimension(800, 600));
@@ -189,22 +221,39 @@ public class NewSheet {
 		scrollPanel.revalidate();
 		scrollPanel.repaint();
 
+		characterList.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					loadSpells();
+					addSpells();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
 		mainWindow.setContentPane(contentPane);
+		loadSpells();
 		addSpells();
 	}
 
 	public void addSpells() throws IOException {
 		scrollPanel.removeAll();
-		FileReader listReader = new FileReader(new File("spellList.txt"));
+		FileReader listReader = new FileReader(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
 		BufferedReader list = new BufferedReader(listReader);
 
 		ArrayList<SpellCard> cards = new ArrayList<SpellCard>();
-
+		System.out.println(list.readLine());
 		String r = list.readLine();
 		while (r != null) {
+			System.out.println(r);
 			cards.add(new SpellCard(this, r));
 			r = list.readLine();
 		}
+		list.close();
 
 		Collections.sort(cards);
 
@@ -216,6 +265,36 @@ public class NewSheet {
 		scrollPane.repaint();
 		scrollPanel.revalidate();
 		scrollPanel.repaint();
+		writeSpells();
+	}
+
+	public void loadSpells() throws IOException {
+		FileReader fr = new FileReader(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
+		BufferedReader read = new BufferedReader(fr);
+		Scanner spells = new Scanner(read.readLine());
+		for (int a = 0; a < 9; a++) {
+			int b = spells.nextInt();
+			maxSlots[a] = b;
+			((JLabel) spellSlots.getComponent(a + 9)).setText(b + "");
+		}
+		spells.close();
+	}
+
+	public void writeSpells() throws IOException {
+		FileWriter fw = new FileWriter(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
+		PrintWriter writer = new PrintWriter(fw);
+		for (int a : maxSlots) {
+			writer.print(a + " ");
+		}
+		writer.println();
+		for (Component a : scrollPanel.getComponents()) {
+			writer.println(((SpellCard) a).title);
+		}
+		writer.close();
+		fw.close();
+
 	}
 
 	public ImageIcon scale(String s, double scale) {
@@ -234,6 +313,6 @@ public class NewSheet {
 	}
 
 	public static void main(String[] args) throws IOException {
-		NewSheet ns = new NewSheet();
+		new NewSheet();
 	}
 }

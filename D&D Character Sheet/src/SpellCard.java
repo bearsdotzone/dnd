@@ -4,15 +4,13 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
-public class SpellCard extends JPanel implements Comparable {
+public class SpellCard extends JPanel implements Comparable<SpellCard> {
 
 	NewSheet newSheet;
 	public JLabel header;
@@ -54,7 +52,6 @@ public class SpellCard extends JPanel implements Comparable {
 			level = 0;
 		} else {
 			level = Integer.parseInt(spell.get(0).replaceAll("\\D", ""));
-			System.out.println(level);
 		}
 
 		if (hasLevel) {
@@ -114,7 +111,7 @@ public class SpellCard extends JPanel implements Comparable {
 
 	}
 
-	public int compareTo(Object arg0) {
+	public int compareTo(SpellCard arg0) {
 		SpellCard compare = SpellCard.class.cast(arg0);
 		if (compare.level < this.level) {
 			return 1;
