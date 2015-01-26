@@ -1,5 +1,6 @@
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 
@@ -24,6 +25,12 @@ public class UsedSpellSlotListener implements MouseListener {
 			if (Integer.parseInt(temp.getText()) > 0) {
 				temp.setText(Integer.parseInt(temp.getText()) - 1 + "");
 			}
+		}
+		try {
+			newSheet.writeSpells(newSheet.cards);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
