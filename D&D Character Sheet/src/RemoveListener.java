@@ -4,23 +4,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ListListener implements ActionListener {
-
+public class RemoveListener implements ActionListener {
 	NewSheet newSheet;
 
-	public ListListener(NewSheet newSheet) {
+	public RemoveListener(NewSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 		try {
-			newSheet.addSpellsToList(newSheet.spellList.getSelectedValuesList());
-			for (String a : newSheet.spellList.getSelectedValuesList()) {
-				newSheet.lm.removeElement(a);
-				if (!newSheet.hm.contains(a))
-					newSheet.hm.addElement(a);
+			newSheet.removeSpellsFromList(newSheet.currentSpells
+					.getSelectedValuesList());
+			for (String a : newSheet.currentSpells.getSelectedValuesList()) {
+				newSheet.hm.removeElement(a);
+				if (!newSheet.lm.contains(a))
+					newSheet.lm.addElement(a);
 			}
-			// Sort lists.
 			ArrayList<String> temp = new ArrayList<String>();
 			for (int b = 0; b < newSheet.hm.size(); b++)
 				temp.add(newSheet.hm.getElementAt(b));
@@ -35,8 +34,7 @@ public class ListListener implements ActionListener {
 			Collections.sort(temp);
 			for (String b : temp)
 				newSheet.lm.addElement(b);
-			// Done sorting.
-			newSheet.spellList.clearSelection();
+			newSheet.currentSpells.clearSelection();
 			newSheet.addSpells();
 		} catch (IOException e) {
 			e.printStackTrace();

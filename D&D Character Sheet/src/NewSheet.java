@@ -64,6 +64,12 @@ public class NewSheet {
 	public JList<String> spellList;
 	public JButton addButton;
 
+	public JScrollPane havePane;
+	public JList<String> currentSpells;
+	public JButton removeButton;
+	public DefaultListModel<String> hm;
+	public DefaultListModel<String> lm;
+
 	public NewSheet() throws IOException {
 
 		new File("character").mkdirs();
@@ -236,16 +242,22 @@ public class NewSheet {
 		spellAdd.setLocation(0, 0);
 
 		spellList = new JList<String>();
-		spellList.setMinimumSize(new Dimension(300, 300));
+		spellList.setMinimumSize(new Dimension(150, 150));
 		spellList.setLayoutOrientation(JList.VERTICAL);
 		spellList.setVisibleRowCount(-1);
 		spellList.setLocation(0, 0);
 
+		currentSpells = new JList<String>();
+		currentSpells.setMinimumSize(new Dimension(150, 150));
+		currentSpells.setLayoutOrientation(JList.VERTICAL);
+		currentSpells.setVisibleRowCount(-1);
+		currentSpells.setLocation(150, 0);
+
 		spellPane = new JScrollPane(spellList);
-		spellPane.setSize(300, mainWindow.getHeight()
+		spellPane.setSize(150, mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
 				- 50);
-		spellPane.setPreferredSize(new Dimension(300, mainWindow.getHeight()
+		spellPane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
 				- 50));
 		spellPane.setLocation(0, 0);
@@ -254,21 +266,45 @@ public class NewSheet {
 		spellPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		DefaultListModel<String> lm = new DefaultListModel<String>();
+		havePane = new JScrollPane(currentSpells);
+		havePane.setSize(150, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
+				- 50);
+		havePane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
+				- 50));
+		havePane.setLocation(150, 0);
+		havePane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		havePane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+		lm = new DefaultListModel<String>();
 		spellList.setModel(lm);
+
+		hm = new DefaultListModel<String>();
+		currentSpells.setModel(hm);
 
 		for (String a : spells.keySet())
 			lm.addElement(a);
 
 		addButton = new JButton("Add Spells");
-		addButton.setSize(280, 50);
+		addButton.setSize(140, 50);
 		addButton.setPreferredSize(new Dimension(300, 50));
 		addButton.setLocation(980, 0);
 		addButton.addActionListener(new ListListener(this));
 
+		removeButton = new JButton("Remove Spells");
+		removeButton.setSize(140, 50);
+		removeButton.setPreferredSize(new Dimension(140, 50));
+		removeButton.setLocation(1120, 0);
+		removeButton.addActionListener(new RemoveListener(this));
+
 		menuBar.add(addButton);
 
+		menuBar.add(removeButton);
+
 		spellAdd.add(spellPane);
+
+		spellAdd.add(havePane);
 
 		contentPane.add(spellAdd, BorderLayout.EAST);
 
@@ -296,6 +332,9 @@ public class NewSheet {
 		mainWindow.setContentPane(contentPane);
 		updateMaxes();
 		addSpells();
+
+		for (String a : cardTitles)
+			hm.addElement(a);
 	}
 
 	public void resize() {
@@ -334,7 +373,10 @@ public class NewSheet {
 
 		Collections.sort(cards);
 
+		cardTitles = new ArrayList<String>();
+
 		for (SpellCard a : cards) {
+			cardTitles.add(a.title);
 			scrollPanel.add(a);
 		}
 
@@ -364,6 +406,31 @@ public class NewSheet {
 			}
 			if (!cardTitles.contains(a))
 				list.add(a);
+		}
+		FileWriter fw = new FileWriter(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
+		PrintWriter pw = new PrintWriter(fw);
+		for (String a : list)
+			pw.println(a);
+		pw.close();
+		fw.close();
+	}
+
+	public void removeSpellsFromList(List<String> selectedValuesList)
+			throws IOException {
+		FileReader fr = new FileReader(new File("character/"
+				+ characterList.getSelectedItem() + ".txt"));
+		BufferedReader read = new BufferedReader(fr);
+		ArrayList<String> list = new ArrayList<String>();
+		String q = read.readLine();
+		while (q != null) {
+			list.add(q);
+			q = read.readLine();
+		}
+		read.close();
+		fr.close();
+		for (String a : selectedValuesList) {
+			list.remove(a);
 		}
 		FileWriter fw = new FileWriter(new File("character/"
 				+ characterList.getSelectedItem() + ".txt"));
@@ -433,4 +500,5 @@ public class NewSheet {
 	public static void main(String[] args) throws IOException {
 		new NewSheet();
 	}
+
 }
