@@ -20,10 +20,12 @@ public class UsedSpellSlotListener implements MouseListener {
 		if (arg0.getButton() == MouseEvent.BUTTON1) {
 			if (Integer.parseInt(temp.getText()) + 1 <= newSheet.maxSlots[index]) {
 				temp.setText(Integer.parseInt(temp.getText()) + 1 + "");
+				newSheet.usedSlots[index] = Integer.parseInt(temp.getText());
 			}
 		} else if (arg0.getButton() == MouseEvent.BUTTON3) {
 			if (Integer.parseInt(temp.getText()) > 0) {
 				temp.setText(Integer.parseInt(temp.getText()) - 1 + "");
+				newSheet.usedSlots[index] = Integer.parseInt(temp.getText());
 			}
 		}
 		try {

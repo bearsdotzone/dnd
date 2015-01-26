@@ -32,6 +32,7 @@ public class CharacterListListener implements ActionListener {
 			FileWriter fw = null;
 			try {
 				fw = new FileWriter("character/" + item + ".txt");
+				fw.write("0 0 0 0 0 0 0 0 0\n");
 				fw.write("0 0 0 0 0 0 0 0 0");
 			} catch (IOException e) {
 				e.printStackTrace();

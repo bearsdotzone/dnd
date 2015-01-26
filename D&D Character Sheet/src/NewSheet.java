@@ -1,18 +1,11 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,8 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 public class NewSheet {
@@ -53,6 +44,7 @@ public class NewSheet {
 	public JPanel spellSlots;
 	public JPanel key;
 	public int[] maxSlots;
+	public int[] usedSlots;
 	public TreeMap<String, ArrayList<String>> spells;
 	public JComboBox<String> characterList;
 	public JButton plusButton;
@@ -148,6 +140,7 @@ public class NewSheet {
 		menuBar.add(key);
 
 		maxSlots = new int[9];
+		usedSlots = new int[9];
 
 		spellSlots = new JPanel(new GridLayout(3, 9));
 		spellSlots.setSize(425, 50);
@@ -368,6 +361,7 @@ public class NewSheet {
 
 		cards = new ArrayList<SpellCard>();
 		list.readLine();
+		list.readLine();
 		String r = list.readLine();
 		while (r != null) {
 			cards.add(new SpellCard(this, r));
@@ -458,6 +452,13 @@ public class NewSheet {
 				maxSlots[a] = b;
 				((JLabel) spellSlots.getComponent(a + 9)).setText(b + "");
 			}
+			d = read.readLine();
+			spells = new Scanner(d);
+			for (int a = 0; a < 9; a++) {
+				int b = spells.nextInt();
+				usedSlots[a] = b;
+				((JLabel) spellSlots.getComponent(a + 18)).setText(b + "");
+			}
 			spells.close();
 		} else {
 		}
@@ -470,6 +471,10 @@ public class NewSheet {
 				+ characterList.getSelectedItem() + ".txt"));
 		PrintWriter writer = new PrintWriter(fw);
 		for (int a : maxSlots) {
+			writer.print(a + " ");
+		}
+		writer.println();
+		for (int a : usedSlots) {
 			writer.print(a + " ");
 		}
 		writer.println();

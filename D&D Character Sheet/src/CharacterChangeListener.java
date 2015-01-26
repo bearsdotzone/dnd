@@ -15,7 +15,7 @@ public class CharacterChangeListener implements ActionListener {
 			newSheet.updateMaxes();
 			newSheet.addSpells();
 			newSheet.writeSpells(newSheet.cards);
-			newSheet.clearUsed();
+			//newSheet.clearUsed();
 			newSheet.updateLists();
 		} catch (IOException e) {
 
