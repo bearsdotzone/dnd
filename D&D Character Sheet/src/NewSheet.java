@@ -55,6 +55,7 @@ public class NewSheet {
 	public JScrollPane spellPane;
 	public JList<String> spellList;
 	public JButton addButton;
+	public JButton clearButton;
 
 	public JScrollPane havePane;
 	public JList<String> currentSpells;
@@ -277,15 +278,15 @@ public class NewSheet {
 		currentSpells.setModel(hm);
 
 		addButton = new JButton("Add Spells");
-		addButton.setSize(140, 50);
+		addButton.setSize(140, 25);
 		addButton.setPreferredSize(new Dimension(300, 50));
 		addButton.setLocation(980, 0);
 		addButton.addActionListener(new ListListener(this));
 
 		removeButton = new JButton("Remove Spells");
-		removeButton.setSize(140, 50);
+		removeButton.setSize(140, 25);
 		removeButton.setPreferredSize(new Dimension(140, 50));
-		removeButton.setLocation(1120, 0);
+		removeButton.setLocation(980, 25);
 		removeButton.addActionListener(new RemoveListener(this));
 
 		menuBar.add(addButton);
@@ -297,6 +298,14 @@ public class NewSheet {
 		spellAdd.add(havePane);
 
 		contentPane.add(spellAdd, BorderLayout.EAST);
+
+		clearButton = new JButton("Clear Used");
+		clearButton.setSize(140, 25);
+		clearButton.setPreferredSize(new Dimension(140, 25));
+		clearButton.setLocation(1120, 0);
+		clearButton.addActionListener(new ClearListener(this));
+
+		menuBar.add(clearButton);
 
 		scrollPane.revalidate();
 		scrollPane.repaint();
@@ -486,10 +495,12 @@ public class NewSheet {
 
 	}
 
-	public void clearUsed() {
+	public void clearUsed() throws IOException {
 		for (int a = 0; a < 9; a++) {
 			((JLabel) spellSlots.getComponent(a + 18)).setText("0");
+			usedSlots[a] = 0;
 		}
+		writeSpells(cards);
 	}
 
 	public ImageIcon scale(String s, double scale) {
