@@ -283,9 +283,6 @@ public class NewSheet {
 		hm = new DefaultListModel<String>();
 		currentSpells.setModel(hm);
 
-		for (String a : spells.keySet())
-			lm.addElement(a);
-
 		addButton = new JButton("Add Spells");
 		addButton.setSize(140, 50);
 		addButton.setPreferredSize(new Dimension(300, 50));
@@ -313,21 +310,7 @@ public class NewSheet {
 		scrollPanel.revalidate();
 		scrollPanel.repaint();
 
-		characterList.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					updateMaxes();
-					addSpells();
-					writeSpells(cards);
-					clearUsed();
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-			}
-		});
+		characterList.addActionListener(new CharacterChangeListener(this));
 
 		mainWindow.setContentPane(contentPane);
 		updateMaxes();
@@ -335,6 +318,22 @@ public class NewSheet {
 
 		for (String a : cardTitles)
 			hm.addElement(a);
+
+		for (String a : spells.keySet())
+			if (!cardTitles.contains(a))
+				lm.addElement(a);
+	}
+
+	public void updateLists() {
+		hm.removeAllElements();
+		lm.removeAllElements();
+
+		for (String a : cardTitles)
+			hm.addElement(a);
+
+		for (String a : spells.keySet())
+			if (!cardTitles.contains(a))
+				lm.addElement(a);
 	}
 
 	public void resize() {
