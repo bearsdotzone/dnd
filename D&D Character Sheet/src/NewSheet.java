@@ -108,6 +108,7 @@ public class NewSheet {
 		mainWindow.setVisible(true);
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainWindow.addComponentListener(new ResizeListener(this));
+		mainWindow.addWindowStateListener(new ResizeStateListener(this));
 
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setSize(mainWindow.getWidth(), mainWindow.getHeight()
