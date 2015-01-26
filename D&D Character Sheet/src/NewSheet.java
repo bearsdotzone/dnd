@@ -8,6 +8,8 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -106,6 +108,7 @@ public class NewSheet {
 		mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
 		mainWindow.setVisible(true);
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainWindow.addComponentListener(new ResizeListener(this));
 
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setSize(mainWindow.getWidth(), mainWindow.getHeight()
@@ -217,7 +220,6 @@ public class NewSheet {
 				mainWindow.getHeight() - mainWindow.getInsets().bottom
 						- mainWindow.getInsets().top - 50));
 		scrollPane.setLocation(0, 0);
-		scrollPane.setBackground(Color.ORANGE);
 		scrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane
@@ -242,12 +244,15 @@ public class NewSheet {
 		spellPane = new JScrollPane(spellList);
 		spellPane.setSize(300, mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
-				- 100);
+				- 50);
 		spellPane.setPreferredSize(new Dimension(300, mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
-				- 100));
+				- 50));
 		spellPane.setLocation(0, 0);
-		spellPane.setBackground(Color.RED);
+		spellPane
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		spellPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		DefaultListModel<String> lm = new DefaultListModel<String>();
 		spellList.setModel(lm);
@@ -256,14 +261,12 @@ public class NewSheet {
 			lm.addElement(a);
 
 		addButton = new JButton("Add Spells");
-		addButton.setSize(300, 50);
+		addButton.setSize(280, 50);
 		addButton.setPreferredSize(new Dimension(300, 50));
-		addButton.setLocation(0,
-				mainWindow.getHeight() - mainWindow.getInsets().bottom
-						- mainWindow.getInsets().top - 100);
+		addButton.setLocation(980, 0);
 		addButton.addActionListener(new ListListener(this));
 
-		spellAdd.add(addButton);
+		menuBar.add(addButton);
 
 		spellAdd.add(spellPane);
 
@@ -293,6 +296,24 @@ public class NewSheet {
 		mainWindow.setContentPane(contentPane);
 		updateMaxes();
 		addSpells();
+	}
+
+	public void resize() {
+		if (spellAdd != null) {
+			spellAdd.setSize(300,
+					mainWindow.getHeight() - mainWindow.getInsets().bottom
+							- mainWindow.getInsets().top);
+			spellAdd.setPreferredSize(new Dimension(300, mainWindow.getHeight()
+					- mainWindow.getInsets().bottom
+					- mainWindow.getInsets().top));
+			spellPane.setSize(300,
+					mainWindow.getHeight() - mainWindow.getInsets().bottom
+							- mainWindow.getInsets().top - 50);
+			spellPane.setPreferredSize(new Dimension(300, mainWindow
+					.getHeight()
+					- mainWindow.getInsets().bottom
+					- mainWindow.getInsets().top - 50));
+		}
 	}
 
 	public void addSpells() throws IOException {
