@@ -16,7 +16,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -51,7 +54,7 @@ public class NewSheet {
 	public JComboBox<String> characterList;
 	public JButton plusButton;
 	public JButton minusButton;
-	public ArrayList<SpellCard> cards;
+	public SortedSet<SpellCard> cards;
 	public JPanel spellAdd;
 	public JScrollPane spellPane;
 	public JList<String> spellList;
@@ -313,7 +316,7 @@ public class NewSheet {
 		for (String a : spells.keySet())
 			lm.addElement(a);
 
-		cards = new ArrayList<SpellCard>();
+		cards = new TreeSet<SpellCard>();
 
 		loadFromText();
 	}
@@ -381,14 +384,8 @@ public class NewSheet {
 
 	public void removeSpellsFromList(List<String> selectedValuesList)
 			throws IOException {
-		int a = 0;
-		while (a < cards.size()) {
-			if (selectedValuesList.contains(cards.get(a).title)) {
-				cards.remove(a);
-			} else {
-				a += 1;
-			}
-		}
+
+		cards.removeIf(new Filter(selectedValuesList));
 
 		saveToText();
 		updateCards();
