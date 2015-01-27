@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -11,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -50,7 +52,6 @@ public class NewSheet {
 	public JButton plusButton;
 	public JButton minusButton;
 	public ArrayList<SpellCard> cards;
-	public ArrayList<String> cardTitles;
 	public JPanel spellAdd;
 	public JScrollPane spellPane;
 	public JList<String> spellList;
@@ -60,8 +61,8 @@ public class NewSheet {
 	public JScrollPane havePane;
 	public JList<String> currentSpells;
 	public JButton removeButton;
-	public DefaultListModel<String> hm;
-	public DefaultListModel<String> lm;
+	public SortedListModel hm;
+	public SortedListModel lm;
 
 	public NewSheet() throws IOException {
 
@@ -117,13 +118,11 @@ public class NewSheet {
 				mainWindow.getHeight() - mainWindow.getInsets().bottom
 						- mainWindow.getInsets().top));
 		contentPane.setLocation(0, 0);
-		// contentPane.setBackground(Color.RED);
 
 		menuBar = new JPanel(null);
 		menuBar.setSize(mainWindow.getWidth(), 50);
 		menuBar.setPreferredSize(new Dimension(mainWindow.getWidth(), 50));
 		menuBar.setLocation(0, 0);
-		// menuBar.setBackground(Color.GREEN);
 
 		scale = 0.5;
 
@@ -147,7 +146,6 @@ public class NewSheet {
 		spellSlots = new JPanel(new GridLayout(3, 9));
 		spellSlots.setSize(425, 50);
 		spellSlots.setLocation(275, 0);
-		// spellSlots.setBackground(Color.MAGENTA);
 
 		for (int a = 0; a < 9; a++) {
 			JLabel temp = new JLabel(a + 1 + "");
@@ -272,10 +270,10 @@ public class NewSheet {
 		havePane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		havePane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		lm = new DefaultListModel<String>();
+		lm = new SortedListModel();
 		spellList.setModel(lm);
 
-		hm = new DefaultListModel<String>();
+		hm = new SortedListModel();
 		currentSpells.setModel(hm);
 
 		addButton = new JButton("Add Spells");
@@ -308,37 +306,16 @@ public class NewSheet {
 
 		menuBar.add(clearButton);
 
-		scrollPane.revalidate();
-		scrollPane.repaint();
-		scrollPanel.revalidate();
-		scrollPanel.repaint();
-
 		characterList.addActionListener(new CharacterChangeListener(this));
 
 		mainWindow.setContentPane(contentPane);
-		updateMaxes();
-		addSpells();
-
-		for (String a : cardTitles)
-			hm.addElement(a);
 
 		for (String a : spells.keySet())
-			if (!cardTitles.contains(a))
-				lm.addElement(a);
-	}
+			lm.addElement(a);
 
-	public void updateLists() {
-		hm.removeAllElements();
-		lm.removeAllElements();
-		if (cardTitles != null) {
-			for (String a : cardTitles)
-				hm.addElement(a);
-		} else {
-			cardTitles = new ArrayList<String>();
-		}
-		for (String a : spells.keySet())
-			if (!cardTitles.contains(a))
-				lm.addElement(a);
+		cards = new ArrayList<SpellCard>();
+
+		loadFromText();
 	}
 
 	public void resize() {
@@ -365,126 +342,84 @@ public class NewSheet {
 		}
 	}
 
-	public void addSpells() throws IOException {
-		scrollPanel.removeAll();
-		updateLists();
-		FileReader listReader = new FileReader(new File("character/"
-				+ characterList.getSelectedItem() + ".txt"));
-		BufferedReader list = new BufferedReader(listReader);
+	public void resizeSpells() {
+		for (Component a : scrollPanel.getComponents()) {
+			SpellCard b = (SpellCard) a;
+			b.reSize();
 
-		cards = new ArrayList<SpellCard>();
-		list.readLine();
-		list.readLine();
-		String r = list.readLine();
-		while (r != null) {
-			cards.add(new SpellCard(this, r));
-			r = list.readLine();
+			scrollPanel.revalidate();
+			scrollPanel.repaint();
 		}
-		list.close();
-		listReader.close();
-
-		Collections.sort(cards);
-
-		cardTitles = new ArrayList<String>();
-
-		for (SpellCard a : cards) {
-			cardTitles.add(a.title);
-			scrollPanel.add(a);
-		}
-
-		scrollPane.revalidate();
-		scrollPane.repaint();
-		scrollPanel.revalidate();
-		scrollPanel.repaint();
-		writeSpells(cards);
 	}
 
 	public void addSpellsToList(List<String> list2) throws IOException {
-		FileReader fr = new FileReader(new File("character/"
-				+ characterList.getSelectedItem() + ".txt"));
-		BufferedReader read = new BufferedReader(fr);
-		ArrayList<String> list = new ArrayList<String>();
-		String q = read.readLine();
-		while (q != null) {
-			list.add(q);
-			q = read.readLine();
-		}
-		read.close();
-		fr.close();
-		for (String a : list2) {
-			cardTitles = new ArrayList<String>();
-			if (cards == null)
-				cards = new ArrayList<SpellCard>();
-			for (SpellCard b : cards) {
-				cardTitles.add(b.title);
+		for (String a : list2)
+			cards.add(new SpellCard(this, a));
+		saveToText();
+		updateCards();
+	}
+
+	public void updateCards() {
+		for (Component a : scrollPanel.getComponents()) {
+			if (!cards.contains((SpellCard) a)) {
+				scrollPanel.remove(a);
+				hm.removeElement(((SpellCard) a).title);
+				lm.addElement(((SpellCard) a).title);
 			}
-			if (!cardTitles.contains(a))
-				list.add(a);
 		}
-		FileWriter fw = new FileWriter(new File("character/"
-				+ characterList.getSelectedItem() + ".txt"));
-		PrintWriter pw = new PrintWriter(fw);
-		for (String a : list)
-			pw.println(a);
-		pw.close();
-		fw.close();
+		for (SpellCard a : cards) {
+			if (!Arrays.asList(scrollPanel.getComponents()).contains(a)) {
+				scrollPanel.add(a);
+				hm.addElement(((SpellCard) a).title);
+				lm.removeElement(((SpellCard) a).title);
+			}
+		}
+
+		scrollPanel.revalidate();
+		scrollPanel.repaint();
 	}
 
 	public void removeSpellsFromList(List<String> selectedValuesList)
 			throws IOException {
+		int a = 0;
+		while (a < cards.size()) {
+			if (selectedValuesList.contains(cards.get(a).title)) {
+				cards.remove(a);
+			} else {
+				a += 1;
+			}
+		}
+
+		saveToText();
+		updateCards();
+	}
+
+	public void loadFromText() throws IOException {
 		FileReader fr = new FileReader(new File("character/"
 				+ characterList.getSelectedItem() + ".txt"));
-		BufferedReader read = new BufferedReader(fr);
-		ArrayList<String> list = new ArrayList<String>();
-		String q = read.readLine();
-		while (q != null) {
-			list.add(q);
-			q = read.readLine();
+		BufferedReader br = new BufferedReader(fr);
+		String m[] = br.readLine().split(" ");
+		String u[] = br.readLine().split(" ");
+		for (int a = 0; a < 9; a++) {
+			maxSlots[a] = Integer.parseInt(m[a]);
+			usedSlots[a] = Integer.parseInt(u[a]);
+			((JLabel) spellSlots.getComponent(9 + a)).setText(m[a]);
+			((JLabel) spellSlots.getComponent(18 + a)).setText(u[a]);
 		}
-		read.close();
+
+		cards.clear();
+
+		String spell = br.readLine();
+		while (spell != null) {
+			cards.add(new SpellCard(this, spell));
+			spell = br.readLine();
+		}
+		br.close();
 		fr.close();
-		for (String a : selectedValuesList) {
-			list.remove(a);
-		}
-		FileWriter fw = new FileWriter(new File("character/"
-				+ characterList.getSelectedItem() + ".txt"));
-		PrintWriter pw = new PrintWriter(fw);
-		for (String a : list)
-			pw.println(a);
-		pw.close();
-		fw.close();
+		updateCards();
 	}
 
-	public void updateMaxes() throws IOException {
-		if (new File("character/" + characterList.getSelectedItem() + ".txt")
-				.exists()) {
-			FileReader fr = new FileReader(new File("character/"
-					+ characterList.getSelectedItem() + ".txt"));
-			BufferedReader read = new BufferedReader(fr);
-			String d = read.readLine();
-			if (d != null) {
-				Scanner spells = new Scanner(d);
-				for (int a = 0; a < 9; a++) {
-					int b = spells.nextInt();
-					maxSlots[a] = b;
-					((JLabel) spellSlots.getComponent(a + 9)).setText(b + "");
-				}
-				d = read.readLine();
-				spells = new Scanner(d);
-				for (int a = 0; a < 9; a++) {
-					int b = spells.nextInt();
-					usedSlots[a] = b;
-					((JLabel) spellSlots.getComponent(a + 18)).setText(b + "");
-				}
-				spells.close();
-			} else {
-			}
-			read.close();
-			fr.close();
-		}
-	}
-
-	public void writeSpells(ArrayList<SpellCard> sC) throws IOException {
+	public void saveToText() throws IOException {
 		FileWriter fw = new FileWriter(new File("character/"
 				+ characterList.getSelectedItem() + ".txt"));
 		PrintWriter writer = new PrintWriter(fw);
@@ -496,7 +431,7 @@ public class NewSheet {
 			writer.print(a + " ");
 		}
 		writer.println();
-		for (SpellCard a : sC) {
+		for (SpellCard a : cards) {
 			writer.println(a.title);
 		}
 		writer.close();
@@ -509,22 +444,7 @@ public class NewSheet {
 			((JLabel) spellSlots.getComponent(a + 18)).setText("0");
 			usedSlots[a] = 0;
 		}
-		writeSpells(cards);
-	}
-
-	public ImageIcon scale(String s, double scale) {
-		ImageIcon temp = null;
-		try {
-			temp = new ImageIcon(NewSheet.class.getResource(s));
-			if (scale == 0.0)
-				scale = 0.01;
-			temp.setImage(temp.getImage().getScaledInstance(
-					(int) (temp.getIconWidth() * scale),
-					(int) (temp.getIconHeight() * scale), Image.SCALE_DEFAULT));
-		} catch (NullPointerException e) {
-
-		}
-		return temp;
+		saveToText();
 	}
 
 	public static void main(String[] args) throws IOException {

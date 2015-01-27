@@ -29,7 +29,7 @@ public class UsedSpellSlotListener implements MouseListener {
 			}
 		}
 		try {
-			newSheet.writeSpells(newSheet.cards);
+			newSheet.saveToText();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -47,7 +47,7 @@ public class CharacterListListener implements ActionListener {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			newSheet.updateLists();
+			// newSheet.updateLists();
 		}
 	}
 }

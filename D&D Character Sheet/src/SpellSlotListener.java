@@ -28,12 +28,8 @@ public class SpellSlotListener implements MouseListener {
 			}
 		}
 		try {
-			if (newSheet.cards == null)
-				newSheet.cards = new ArrayList<SpellCard>();
-			newSheet.writeSpells(newSheet.cards);
+			newSheet.saveToText();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 

@@ -20,6 +20,7 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 	public int level;
 	public JTextPane description;
 	public JScrollPane scroll;
+	public boolean hasLevel;
 
 	public SpellCard(NewSheet newSheet, String title) {
 		this.newSheet = newSheet;
@@ -43,7 +44,7 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 
 		add(header, BorderLayout.NORTH);
 
-		boolean hasLevel = true;
+		hasLevel = true;
 
 		spell = newSheet.spells.get(title);
 
@@ -123,5 +124,38 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 			else
 				return -1;
 		}
+	}
+
+	public void reSize() {
+		setSize((int) (newSheet.scale * 730), (int) (newSheet.scale * 1020));
+		setPreferredSize(new Dimension((int) (newSheet.scale * 730),
+				(int) (newSheet.scale * 1020)));
+		header.setSize((int) (newSheet.scale * 730),
+				(int) (newSheet.scale * 200));
+		header.setPreferredSize(new Dimension((int) (newSheet.scale * 730),
+				(int) (newSheet.scale * 200)));
+		if (hasLevel) {
+			footer.setSize((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 100));
+			footer.setPreferredSize(new Dimension((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 100)));
+			scroll.setSize((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 720));
+			scroll.setPreferredSize(new Dimension((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 720)));
+			scroll.setMinimumSize(new Dimension((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 720)));
+		} else {
+			scroll.setSize((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 820));
+			scroll.setPreferredSize(new Dimension((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 820)));
+			scroll.setMinimumSize(new Dimension((int) (newSheet.scale * 730),
+					(int) (newSheet.scale * 820)));
+		}
+	}
+
+	public String toString() {
+		return title;
 	}
 }

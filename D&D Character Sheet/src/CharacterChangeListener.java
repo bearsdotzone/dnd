@@ -12,11 +12,7 @@ public class CharacterChangeListener implements ActionListener {
 
 	public void actionPerformed(ActionEvent arg0) {
 		try {
-			newSheet.updateMaxes();
-			newSheet.addSpells();
-			newSheet.writeSpells(newSheet.cards);
-			//newSheet.clearUsed();
-			newSheet.updateLists();
+			newSheet.loadFromText();
 		} catch (IOException e) {
 
 		}
