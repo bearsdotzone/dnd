@@ -3,9 +3,9 @@ import java.awt.event.WindowStateListener;
 
 public class ResizeStateListener implements WindowStateListener {
 
-	NewSheet newSheet;
+	SpellSheet newSheet;
 
-	public ResizeStateListener(NewSheet newSheet) {
+	public ResizeStateListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 

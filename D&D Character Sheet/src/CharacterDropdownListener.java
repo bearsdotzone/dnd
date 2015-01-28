@@ -2,11 +2,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-public class CharacterChangeListener implements ActionListener {
+public class CharacterDropdownListener implements ActionListener {
 
-	public NewSheet newSheet;
+	public SpellSheet newSheet;
 
-	public CharacterChangeListener(NewSheet newSheet) {
+	public CharacterDropdownListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 

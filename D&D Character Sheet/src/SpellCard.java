@@ -12,8 +12,8 @@ import javax.swing.JTextPane;
 
 public class SpellCard extends JPanel implements Comparable<SpellCard> {
 
-	NewSheet newSheet;
-	public JLabel header;
+	SpellSheet newSheet;
+	public DynamicFontLabel header;
 	public String title;
 	public JPanel footer;
 	public ArrayList<String> spell;
@@ -22,7 +22,7 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 	public JScrollPane scroll;
 	public boolean hasLevel;
 
-	public SpellCard(NewSheet newSheet, String title) {
+	public SpellCard(SpellSheet newSheet, String title) {
 		this.newSheet = newSheet;
 		this.title = title;
 
@@ -31,13 +31,12 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 				(int) (newSheet.scale * 1020)));
 		setLayout(new BorderLayout());
 
-		header = new JLabel();
+		header = new DynamicFontLabel(title);
 		header.setSize((int) (newSheet.scale * 730),
 				(int) (newSheet.scale * 200));
 		header.setPreferredSize(new Dimension((int) (newSheet.scale * 730),
 				(int) (newSheet.scale * 200)));
 		header.setLocation(0, 0);
-		header.setText(title);
 		header.setFont(new Font(Font.SANS_SERIF, Font.BOLD,
 				(int) (newSheet.scale * 80)));
 		header.setHorizontalAlignment(JLabel.CENTER);
@@ -48,7 +47,7 @@ public class SpellCard extends JPanel implements Comparable<SpellCard> {
 
 		spell = newSheet.spells.get(title);
 
-		if (spell.get(0).matches(".* Cantrip")) {
+		if (spell.get(0).toLowerCase().matches(".* cantrip.*")) {
 			hasLevel = false;
 			level = 0;
 		} else {

@@ -3,9 +3,9 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class ClearListener implements ActionListener {
-	NewSheet newSheet;
+	SpellSheet newSheet;
 
-	public ClearListener(NewSheet newSheet) {
+	public ClearListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 

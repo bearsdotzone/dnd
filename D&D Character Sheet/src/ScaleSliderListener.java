@@ -3,11 +3,11 @@ import java.io.IOException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class SpellSliderListener implements ChangeListener {
+public class ScaleSliderListener implements ChangeListener {
 
-	NewSheet newSheet;
+	SpellSheet newSheet;
 
-	public SpellSliderListener(NewSheet newSheet) {
+	public ScaleSliderListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 

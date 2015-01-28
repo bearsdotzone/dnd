@@ -9,9 +9,9 @@ public class SpellSlotListener implements MouseListener {
 
 	JLabel temp;
 	int index;
-	NewSheet newSheet;
+	SpellSheet newSheet;
 
-	public SpellSlotListener(JLabel temp, int index, NewSheet newSheet) {
+	public SpellSlotListener(JLabel temp, int index, SpellSheet newSheet) {
 		this.temp = temp;
 		this.index = index;
 		this.newSheet = newSheet;

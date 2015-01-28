@@ -3,9 +3,9 @@ import java.awt.event.ComponentListener;
 
 public class ResizeListener implements ComponentListener {
 
-	NewSheet newSheet;
+	SpellSheet newSheet;
 
-	public ResizeListener(NewSheet newSheet) {
+	public ResizeListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 

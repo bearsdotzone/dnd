@@ -1,11 +1,11 @@
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Filter<T> implements Predicate<T> {
+public class FilterForTitle<T> implements Predicate<T> {
 
 	List<String> cards;
 
-	public Filter(List<String> cards) {
+	public FilterForTitle(List<String> cards) {
 		this.cards = cards;
 	}
 

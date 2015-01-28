@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ListListener implements ActionListener {
+public class AddSpellToListListener implements ActionListener {
 
-	NewSheet newSheet;
+	SpellSheet newSheet;
 
-	public ListListener(NewSheet newSheet) {
+	public AddSpellToListListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 		try {
-			newSheet.addSpellsToList(newSheet.spellList.getSelectedValuesList());
-			newSheet.spellList.clearSelection();
+			newSheet.addSpellsToList(newSheet.bigList.getSelectedValuesList());
+			newSheet.bigList.clearSelection();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class RemoveListener implements ActionListener {
-	NewSheet newSheet;
+public class RemoveSpellFromListListener implements ActionListener {
+	SpellSheet newSheet;
 
-	public RemoveListener(NewSheet newSheet) {
+	public RemoveSpellFromListListener(SpellSheet newSheet) {
 		this.newSheet = newSheet;
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 		try {
-			newSheet.removeSpellsFromList(newSheet.currentSpells
+			newSheet.removeSpellsFromList(newSheet.smallList
 					.getSelectedValuesList());
-			newSheet.currentSpells.clearSelection();
+			newSheet.smallList.clearSelection();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

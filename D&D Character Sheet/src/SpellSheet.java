@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,6 +22,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,17 +37,17 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class NewSheet {
+public class SpellSheet {
 
 	public JFrame mainWindow;
 	public JPanel contentPane;
-	public JPanel menuBar;
+	public JPanel optionsMenu;
 	public JScrollPane scrollPane;
 	public JButton refresh;
 	public JSlider slider;
 	public JTextField textField;
 	public double scale;
-	public JPanel scrollPanel;
+	public JPanel spellContainer;
 	public JPanel spellSlots;
 	public JPanel key;
 	public int[] maxSlots;
@@ -55,26 +57,29 @@ public class NewSheet {
 	public JButton plusButton;
 	public JButton minusButton;
 	public SortedSet<SpellCard> cards;
-	public JPanel spellAdd;
-	public JScrollPane spellPane;
-	public JList<String> spellList;
+	public JPanel spellMenu;
+	public JScrollPane bigListPane;
+	public JList<String> bigList;
 	public JButton addButton;
 	public JButton clearButton;
-
-	public JScrollPane havePane;
-	public JList<String> currentSpells;
+	public JPanel sideBar;
+	public JScrollPane smallListPane;
+	public JList<String> smallList;
 	public JButton removeButton;
-	public SortedListModel hm;
-	public SortedListModel lm;
+	public SortedListModel smallListModel;
+	public SortedListModel bigListModel;
 
-	public NewSheet() throws IOException {
+	public SpellSheet() throws IOException {
 
+		// Creates the character folder.
 		new File("character").mkdirs();
 
+		// This big old block turns the spell database into a tree map. This is
+		// so I minimize read/write operations.
 		spells = new TreeMap<String, ArrayList<String>>();
 		FileReader databaseInit = null;
 		try {
-			databaseInit = new FileReader(new File("newSpellDatabase.txt"));
+			databaseInit = new FileReader(new File("SpellDatabase.txt"));
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null,
 					"No database found. Try the readme.", "",
@@ -105,15 +110,21 @@ public class NewSheet {
 		}
 		database.close();
 		databaseInit.close();
+		// End tree map block.
 
+		// Basic setup of the main window.
 		mainWindow = new JFrame("Spell Sheet");
 		mainWindow.setSize(1280, 720);
 		mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
 		mainWindow.setVisible(true);
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// Adds listeners to trigger resizing of components when the main window
+		// is resized.
 		mainWindow.addComponentListener(new ResizeListener(this));
 		mainWindow.addWindowStateListener(new ResizeStateListener(this));
 
+		// This is where all the components end up. Putting them all in the main
+		// window seems to be not best practice, or at least less than ideal.
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setSize(mainWindow.getWidth(), mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top);
@@ -122,99 +133,124 @@ public class NewSheet {
 						- mainWindow.getInsets().top));
 		contentPane.setLocation(0, 0);
 
-		menuBar = new JPanel(null);
-		menuBar.setSize(mainWindow.getWidth(), 50);
-		menuBar.setPreferredSize(new Dimension(mainWindow.getWidth(), 50));
-		menuBar.setLocation(0, 0);
+		// Sets up borderlayout for east side of the screen.
+		sideBar = new JPanel(null);
+		sideBar.setSize(300, mainWindow.getHeight()
+				- mainWindow.getInsets().top - mainWindow.getInsets().bottom);
+		sideBar.setPreferredSize(new Dimension(300, mainWindow.getHeight()
+				- mainWindow.getInsets().top - mainWindow.getInsets().bottom));
+		sideBar.setLocation(0, 0);
 
+		// This sets up the menu in the top right.
+		optionsMenu = new JPanel(null);
+		optionsMenu.setSize(300, 300);
+		optionsMenu.setPreferredSize(new Dimension(300, 300));
+		optionsMenu.setLocation(0, 0);
+		// optionsMenu.setBackground(Color.RED);
+
+		// This is the default UI scale for the spell cards.
 		scale = 0.5;
 
+		// This is the key to deciphering the level/max/used grid.
 		key = new JPanel(new GridLayout(3, 1));
-		key.setSize(75, 50);
-		key.setLocation(200, 0);
+		key.setSize(30, 75);
+		key.setLocation(5, 140);
+		
 
-		String[] words = { "Level", "Max", "Used" };
+		String[] words = { "L", "M", "U" };
 
 		for (String a : words) {
 			JLabel temp = new JLabel(a);
 			temp.setHorizontalAlignment(JLabel.CENTER);
+			temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			key.add(temp);
 		}
 
-		menuBar.add(key);
+		optionsMenu.add(key);
 
 		maxSlots = new int[9];
 		usedSlots = new int[9];
 
+		// Simple grid with special listeners for the labels.
 		spellSlots = new JPanel(new GridLayout(3, 9));
-		spellSlots.setSize(425, 50);
-		spellSlots.setLocation(275, 0);
+		spellSlots.setSize(255, 75);
+		spellSlots.setLocation(40, 140);
 
 		for (int a = 0; a < 9; a++) {
 			JLabel temp = new JLabel(a + 1 + "");
 			temp.setHorizontalAlignment(JLabel.CENTER);
+			temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			spellSlots.add(temp);
+
 		}
+
 		for (int a = 0; a < 9; a++) {
 			JLabel temp = new JLabel("0");
 			temp.setHorizontalAlignment(JLabel.CENTER);
 			temp.addMouseListener(new SpellSlotListener(temp, a, this));
+			temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			spellSlots.add(temp);
 		}
+
 		for (int a = 0; a < 9; a++) {
 			JLabel temp = new JLabel("0");
 			temp.setHorizontalAlignment(JLabel.CENTER);
 			temp.addMouseListener(new UsedSpellSlotListener(temp, a, this));
+			temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			spellSlots.add(temp);
 		}
 
-		menuBar.add(spellSlots);
+		optionsMenu.add(spellSlots);
 
+		// Scale slider.
 		slider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 50);
-		slider.setSize(200, 50);
-		slider.setLocation(0, 0);
+		slider.setSize(290, 60);
+		slider.setLocation(5, 80);
 		slider.setMajorTickSpacing(20);
 		slider.setMinorTickSpacing(5);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
-		slider.addChangeListener(new SpellSliderListener(this));
+		slider.addChangeListener(new ScaleSliderListener(this));
 
-		menuBar.add(slider);
+		optionsMenu.add(slider);
 
+		// Dropdown for characters.
 		characterList = new JComboBox<String>();
-		characterList.setSize(200, 25);
-		characterList.setPreferredSize(new Dimension(200, 25));
-		characterList.setLocation(700, 12);
+		characterList.setSize(290, 25);
+		characterList.setPreferredSize(new Dimension(290, 25));
+		characterList.setLocation(5, 5);
 
 		for (File a : new File("character/").listFiles())
 			characterList.addItem(a.getName().replaceAll(".txt", ""));
 
-		menuBar.add(characterList);
+		optionsMenu.add(characterList);
 
-		minusButton = new JButton("-");
-		minusButton.setSize(40, 40);
-		minusButton.setSize(new Dimension(40, 40));
-		minusButton.setLocation(900, 5);
+		// Remove characters button.
+		minusButton = new JButton("Remove Selected");
+		minusButton.setSize(140, 40);
+		minusButton.setSize(new Dimension(140, 40));
+		minusButton.setLocation(5, 35);
 		minusButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
-		minusButton.addActionListener(new CharacterListListener(characterList,
-				true, this));
+		minusButton.addActionListener(new CharacterRemoveListener(
+				characterList, this));
 
-		menuBar.add(minusButton);
+		optionsMenu.add(minusButton);
 
-		plusButton = new JButton("+");
-		plusButton.setSize(40, 40);
-		plusButton.setSize(new Dimension(40, 40));
-		plusButton.setLocation(940, 5);
+		// Add characters button.
+		plusButton = new JButton("Add Character");
+		plusButton.setSize(140, 40);
+		plusButton.setSize(new Dimension(140, 40));
+		plusButton.setLocation(155, 35);
 		plusButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
-		plusButton.addActionListener(new CharacterListListener(characterList,
-				false, this));
+		plusButton.addActionListener(new CharacterAddListener(characterList,
+				this));
 
-		menuBar.add(plusButton);
+		optionsMenu.add(plusButton);
 
-		scrollPanel = new JPanel(new WrapLayout());
-		scrollPanel.setMinimumSize(new Dimension(800, 600));
+		spellContainer = new JPanel(new WrapLayout());
+		spellContainer.setMinimumSize(new Dimension(800, 600));
 
-		scrollPane = new JScrollPane(scrollPanel);
+		scrollPane = new JScrollPane(spellContainer);
 		scrollPane.setSize(mainWindow.getWidth(), mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
 				- 50);
@@ -227,131 +263,148 @@ public class NewSheet {
 		scrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		contentPane.add(menuBar, BorderLayout.NORTH);
+		// contentPane.add(optionsMenu, BorderLayout.NORTH);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
-		spellAdd = new JPanel(null);
-		spellAdd.setSize(300, mainWindow.getHeight()
-				- mainWindow.getInsets().bottom - mainWindow.getInsets().top);
-		spellAdd.setPreferredSize(new Dimension(300, mainWindow.getHeight()
-				- mainWindow.getInsets().bottom - mainWindow.getInsets().top));
-		spellAdd.setLocation(0, 0);
-
-		spellList = new JList<String>();
-		spellList.setMinimumSize(new Dimension(150, 150));
-		spellList.setLayoutOrientation(JList.VERTICAL);
-		spellList.setVisibleRowCount(-1);
-		spellList.setLocation(0, 0);
-
-		currentSpells = new JList<String>();
-		currentSpells.setMinimumSize(new Dimension(150, 150));
-		currentSpells.setLayoutOrientation(JList.VERTICAL);
-		currentSpells.setVisibleRowCount(-1);
-		currentSpells.setLocation(150, 0);
-
-		spellPane = new JScrollPane(spellList);
-		spellPane.setSize(150, mainWindow.getHeight()
+		spellMenu = new JPanel(null);
+		spellMenu.setSize(300, mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
-				- 50);
-		spellPane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
+				- 300);
+		spellMenu.setPreferredSize(new Dimension(300, mainWindow.getHeight()
 				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
-				- 50));
-		spellPane.setLocation(0, 0);
-		spellPane
+				- 300));
+		spellMenu.setLocation(0, 300);
+
+		bigList = new JList<String>();
+		bigList.setMinimumSize(new Dimension(150, 150));
+		bigList.setLayoutOrientation(JList.VERTICAL);
+		bigList.setVisibleRowCount(-1);
+		bigList.setLocation(0, 0);
+
+		smallList = new JList<String>();
+		smallList.setMinimumSize(new Dimension(150, 150));
+		smallList.setLayoutOrientation(JList.VERTICAL);
+		smallList.setVisibleRowCount(-1);
+		smallList.setLocation(150, 0);
+
+		bigListPane = new JScrollPane(bigList);
+		bigListPane.setSize(150,
+				mainWindow.getHeight() - mainWindow.getInsets().bottom
+						- mainWindow.getInsets().top - 300);
+		bigListPane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
+				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
+				- 300));
+		bigListPane.setLocation(0, 0);
+		bigListPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		spellPane
+		bigListPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		havePane = new JScrollPane(currentSpells);
-		havePane.setSize(150, mainWindow.getHeight()
-				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
-				- 50);
-		havePane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
-				- mainWindow.getInsets().bottom - mainWindow.getInsets().top
-				- 50));
-		havePane.setLocation(150, 0);
-		havePane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		havePane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		smallListPane = new JScrollPane(smallList);
+		smallListPane.setSize(150,
+				mainWindow.getHeight() - mainWindow.getInsets().bottom
+						- mainWindow.getInsets().top - 300);
+		smallListPane.setPreferredSize(new Dimension(150, mainWindow
+				.getHeight()
+				- mainWindow.getInsets().bottom
+				- mainWindow.getInsets().top - 300));
+		smallListPane.setLocation(150, 0);
+		smallListPane
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		smallListPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		lm = new SortedListModel();
-		spellList.setModel(lm);
+		bigListModel = new SortedListModel();
+		bigList.setModel(bigListModel);
 
-		hm = new SortedListModel();
-		currentSpells.setModel(hm);
+		smallListModel = new SortedListModel();
+		smallList.setModel(smallListModel);
 
 		addButton = new JButton("Add Spells");
 		addButton.setSize(140, 25);
-		addButton.setPreferredSize(new Dimension(300, 50));
-		addButton.setLocation(980, 0);
-		addButton.addActionListener(new ListListener(this));
+		addButton.setPreferredSize(new Dimension(140, 25));
+		addButton.setLocation(5, 270);
+		addButton.addActionListener(new AddSpellToListListener(this));
 
 		removeButton = new JButton("Remove Spells");
 		removeButton.setSize(140, 25);
-		removeButton.setPreferredSize(new Dimension(140, 50));
-		removeButton.setLocation(980, 25);
-		removeButton.addActionListener(new RemoveListener(this));
+		removeButton.setPreferredSize(new Dimension(140, 25));
+		removeButton.setLocation(155, 270);
+		removeButton.addActionListener(new RemoveSpellFromListListener(this));
 
-		menuBar.add(addButton);
+		optionsMenu.add(addButton);
 
-		menuBar.add(removeButton);
+		optionsMenu.add(removeButton);
 
-		spellAdd.add(spellPane);
+		spellMenu.add(bigListPane);
 
-		spellAdd.add(havePane);
+		spellMenu.add(smallListPane);
 
-		contentPane.add(spellAdd, BorderLayout.EAST);
+		sideBar.add(spellMenu);
+		sideBar.add(optionsMenu);
+
+		// contentPane.add(spellAdd, BorderLayout.EAST);
 
 		clearButton = new JButton("Clear Used");
 		clearButton.setSize(140, 25);
 		clearButton.setPreferredSize(new Dimension(140, 25));
-		clearButton.setLocation(1120, 0);
+		clearButton.setLocation(80, 220);
 		clearButton.addActionListener(new ClearListener(this));
 
-		menuBar.add(clearButton);
+		optionsMenu.add(clearButton);
 
-		characterList.addActionListener(new CharacterChangeListener(this));
+		characterList.addActionListener(new CharacterDropdownListener(this));
+
+		contentPane.add(sideBar, BorderLayout.EAST);
 
 		mainWindow.setContentPane(contentPane);
 
 		for (String a : spells.keySet())
-			lm.addElement(a);
+			bigListModel.addElement(a);
 
 		cards = new TreeSet<SpellCard>();
+
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+		bigList.addMouseListener(new BigListListener(this));
+		smallList.addMouseListener(new SmallListListener(this));
 
 		loadFromText();
 	}
 
 	public void resize() {
-		if (spellAdd != null) {
-			spellAdd.setSize(300,
+		if (spellMenu != null) {
+			spellMenu.setSize(300,
 					mainWindow.getHeight() - mainWindow.getInsets().bottom
-							- mainWindow.getInsets().top);
-			spellAdd.setPreferredSize(new Dimension(300, mainWindow.getHeight()
-					- mainWindow.getInsets().bottom
-					- mainWindow.getInsets().top));
-			spellPane.setSize(150,
-					mainWindow.getHeight() - mainWindow.getInsets().bottom
-							- mainWindow.getInsets().top - 50);
-			spellPane.setPreferredSize(new Dimension(150, mainWindow
+							- mainWindow.getInsets().top - 300);
+			spellMenu.setPreferredSize(new Dimension(300, mainWindow
 					.getHeight()
 					- mainWindow.getInsets().bottom
-					- mainWindow.getInsets().top - 50));
-			havePane.setSize(150,
+					- mainWindow.getInsets().top - 300));
+			bigListPane.setSize(150,
 					mainWindow.getHeight() - mainWindow.getInsets().bottom
-							- mainWindow.getInsets().top - 50);
-			havePane.setPreferredSize(new Dimension(150, mainWindow.getHeight()
+							- mainWindow.getInsets().top - 300);
+			bigListPane.setPreferredSize(new Dimension(150, mainWindow
+					.getHeight()
 					- mainWindow.getInsets().bottom
-					- mainWindow.getInsets().top - 50));
+					- mainWindow.getInsets().top - 300));
+			smallListPane.setSize(150,
+					mainWindow.getHeight() - mainWindow.getInsets().bottom
+							- mainWindow.getInsets().top - 300);
+			smallListPane.setPreferredSize(new Dimension(150, mainWindow
+					.getHeight()
+					- mainWindow.getInsets().bottom
+					- mainWindow.getInsets().top - 300));
 		}
 	}
 
 	public void resizeSpells() {
-		for (Component a : scrollPanel.getComponents()) {
+		for (Component a : spellContainer.getComponents()) {
 			SpellCard b = (SpellCard) a;
 			b.reSize();
 
-			scrollPanel.revalidate();
-			scrollPanel.repaint();
+			spellContainer.revalidate();
+			spellContainer.repaint();
 		}
 	}
 
@@ -363,29 +416,29 @@ public class NewSheet {
 	}
 
 	public void updateCards() {
-		for (Component a : scrollPanel.getComponents()) {
+		for (Component a : spellContainer.getComponents()) {
 			if (!cards.contains((SpellCard) a)) {
-				scrollPanel.remove(a);
-				hm.removeElement(((SpellCard) a).title);
-				lm.addElement(((SpellCard) a).title);
+				spellContainer.remove(a);
+				smallListModel.removeElement(((SpellCard) a).title);
+				bigListModel.addElement(((SpellCard) a).title);
 			}
 		}
 		for (SpellCard a : cards) {
-			if (!Arrays.asList(scrollPanel.getComponents()).contains(a)) {
-				scrollPanel.add(a);
-				hm.addElement(((SpellCard) a).title);
-				lm.removeElement(((SpellCard) a).title);
+			if (!Arrays.asList(spellContainer.getComponents()).contains(a)) {
+				spellContainer.add(a);
+				smallListModel.addElement(((SpellCard) a).title);
+				bigListModel.removeElement(((SpellCard) a).title);
 			}
 		}
 
-		scrollPanel.revalidate();
-		scrollPanel.repaint();
+		spellContainer.revalidate();
+		spellContainer.repaint();
 	}
 
 	public void removeSpellsFromList(List<String> selectedValuesList)
 			throws IOException {
 
-		cards.removeIf(new Filter(selectedValuesList));
+		cards.removeIf(new FilterForTitle(selectedValuesList));
 
 		saveToText();
 		updateCards();
@@ -445,7 +498,7 @@ public class NewSheet {
 	}
 
 	public static void main(String[] args) throws IOException {
-		new NewSheet();
+		new SpellSheet();
 	}
 
 }
