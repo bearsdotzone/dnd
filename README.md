@@ -1,5 +1,5 @@
 # Desktop Spell Sheet
-
+<b>Requires Java 8, sorry.</b>
 <b>How to Use:</b> Have a properly formatted spell database* called SpellDatabase.txt in the same directory as the .jar file.
 
 I hope most of the UI is straightforward.
