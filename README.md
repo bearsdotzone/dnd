@@ -1,11 +1,17 @@
-# dnd
+# Desktop Spell Sheet
 
-The slider is scale of the cards.
+<b>How to Use:</b> Have a properly formatted spell database* called SpellDatabase.txt in the same directory as the .jar file.
 
-Left click max spells to increase, right click to decrease.
-Similarly you can use spells in the same way.
+I hope most of the UI is straightforward.
 
-Obtain a properly formatted database:
+On the spell slot grid, a left click will increase the number and a right click will decrease it.
+Logically, used spell slot numbers cannot go above those of their respective maxes.
+
+The slider adjusts scale of the spell cards. Should also fix any broken font sizes.
+
+Spells are added from left to right. A double click will also do the trick for a single spell either added or removed.
+
+*Properly formatted spell database:
 
 	******
 	Spell Name
@@ -25,5 +31,3 @@ The DatabaseOrganizer build will allow easy conversion of the community resource
 	
 	3. Delete omegaDatabase.txt and testSpellDatabase.txt
 	
-
-You can edit spellList.txt while the program is running, just change the scale for the program to refresh and update to your changes.
