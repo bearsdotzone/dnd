@@ -36,6 +36,9 @@ import javax.swing.SwingConstants;
 
 public class SpellSheet {
 
+	private static final String SAMPLE_SPELL_DATABASE_TXT = "SampleSpellDatabase.txt";
+	private static final String SPELL_DATABASE_TXT = "SpellDatabase.txt";
+
 	private final Logger LOGGER = Logger.getLogger(SpellSheet.class.getName());
 
 	public JFrame mainWindow;
@@ -378,12 +381,12 @@ public class SpellSheet {
 	 */
 	private FileReader retrieveDatabase() {
 		FileReader databaseInit = null;
-		File spellDB = new File("SpellDatabase.txt");
+		File spellDB = new File(SPELL_DATABASE_TXT);
 		if (spellDB.exists())
 			try {
 				databaseInit = new FileReader(spellDB);
 			} catch (FileNotFoundException e) {
-				LOGGER.severe("Could not find SpellDatabase.txt at the given location: "
+				LOGGER.severe("Could not find " + SPELL_DATABASE_TXT + " at the given location: "
 						+ spellDB.getAbsolutePath());
 				e.printStackTrace();
 			}
@@ -415,11 +418,11 @@ public class SpellSheet {
 
 		// Use default
 		case 0:
-			spellDb = new File("SampleSpellDatabase.txt");
+			spellDb = new File(SAMPLE_SPELL_DATABASE_TXT);
 			try {
 				databaseInit = new FileReader(spellDb);
 			} catch (FileNotFoundException e) {
-				LOGGER.severe("Could not SampleSpellDatabase.txt");
+				LOGGER.severe("Could not " + SAMPLE_SPELL_DATABASE_TXT);
 				e.printStackTrace();
 			}
 			break;
