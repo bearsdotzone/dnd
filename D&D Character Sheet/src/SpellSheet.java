@@ -5,28 +5,25 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,6 +35,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 public class SpellSheet {
+
+	private final Logger LOGGER = Logger.getLogger(SpellSheet.class.getName());
 
 	public JFrame mainWindow;
 	public JPanel contentPane;
@@ -77,15 +76,14 @@ public class SpellSheet {
 		// This big old block turns the spell database into a tree map. This is
 		// so I minimize read/write operations.
 		spells = new TreeMap<String, ArrayList<String>>();
-		FileReader databaseInit = null;
-		try {
-			databaseInit = new FileReader(new File("SpellDatabase.txt"));
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null,
-					"No database found. Try the readme.", "",
-					JOptionPane.ERROR_MESSAGE);
+
+		FileReader databaseInit = retrieveDatabase();
+
+		// according to retrieveDatabase, a null value indicates the user wishes
+		// to exit
+		if (databaseInit == null)
 			System.exit(1);
-		}
+
 		BufferedReader database = new BufferedReader(databaseInit);
 
 		String read = database.readLine();
@@ -155,7 +153,6 @@ public class SpellSheet {
 		key = new JPanel(new GridLayout(3, 1));
 		key.setSize(30, 75);
 		key.setLocation(5, 140);
-		
 
 		String[] words = { "L", "M", "U" };
 
@@ -372,6 +369,87 @@ public class SpellSheet {
 		loadFromText();
 	}
 
+	/**
+	 * Attempts to read from SpellDatabase.txt, if the file doesn't exist, this
+	 * method will prompt the user with 3 choices: (Use SmapleSpellDatabase,
+	 * Provide own file, Exit).
+	 * 
+	 * @return a FileReader with the file that should be used as the database
+	 */
+	private FileReader retrieveDatabase() {
+		FileReader databaseInit = null;
+		File spellDB = new File("SpellDatabase.txt");
+		if (spellDB.exists())
+			try {
+				databaseInit = new FileReader(spellDB);
+			} catch (FileNotFoundException e) {
+				LOGGER.severe("Could not find SpellDatabase.txt at the given location: "
+						+ spellDB.getAbsolutePath());
+				e.printStackTrace();
+			}
+		else {
+			databaseInit = retrieveDatabaseDialog();
+		}
+		return databaseInit;
+	}
+
+	/**
+	 * Creates a Dialog prompting the user for a selection of one of three
+	 * choices : Use Default Database, Provide Own Database, or Exit. If any
+	 * portion of the process fails while providing own database, the user will
+	 * be prompted again with the same dialog.
+	 * 
+	 * @return a FileReader, could be <code>null</code> which means the user
+	 *         selected cancel, or a non null file reader with the contents of a
+	 *         file
+	 */
+	private FileReader retrieveDatabaseDialog() {
+		File spellDb = null;
+		FileReader databaseInit = null;
+		String options[] = { "Use Default", "Provide Own", "Exit" };
+		int option = JOptionPane.showOptionDialog(null, "No database found.",
+				"Data Error", JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.INFORMATION_MESSAGE, null, options, options);
+
+		switch (option) {
+
+		// Use default
+		case 0:
+			spellDb = new File("SampleSpellDatabase.txt");
+			try {
+				databaseInit = new FileReader(spellDb);
+			} catch (FileNotFoundException e) {
+				LOGGER.severe("Could not SampleSpellDatabase.txt");
+				e.printStackTrace();
+			}
+			break;
+		// Supply own
+		case 1:
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.showOpenDialog(null);
+			File selectedFile = fileChooser.getSelectedFile();
+
+			// ask again till the user hits cancel
+			if (selectedFile == null) {
+				return retrieveDatabaseDialog();
+			}
+
+			try {
+				databaseInit = new FileReader(selectedFile);
+			} catch (FileNotFoundException e) {
+				LOGGER.severe("Could not read file: "
+						+ selectedFile.getAbsolutePath());
+				e.printStackTrace();
+			}
+
+			break;
+		// Exit
+		default:
+			return null;
+		}
+		return databaseInit;
+	}
+
 	public void resize() {
 		if (spellMenu != null) {
 			spellMenu.setSize(300,
@@ -445,6 +523,12 @@ public class SpellSheet {
 	}
 
 	public void loadFromText() throws IOException {
+
+		if (characterList.getSelectedItem() == null) {
+			LOGGER.severe("No character selected, an IOException will be thrown trying to read from null.txt");
+			//TODO : provide option to create character or use a default
+		}
+
 		FileReader fr = new FileReader(new File("character/"
 				+ characterList.getSelectedItem() + ".txt"));
 		BufferedReader br = new BufferedReader(fr);
