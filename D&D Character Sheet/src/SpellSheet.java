@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -519,7 +520,16 @@ public class SpellSheet {
 	public void removeSpellsFromList(List<String> selectedValuesList)
 			throws IOException {
 
-		cards.removeIf(new FilterForTitle(selectedValuesList));
+		// No need for the filter object if we can do it inline
+		//		cards.removeIf(new FilterForTitle(selectedValuesList));
+		
+		for (final String selectedValue : selectedValuesList) {
+			cards.removeIf(new Predicate<SpellCard>() { 
+				public boolean test(SpellCard t) {
+					return t.title.equals(selectedValue);
+				}
+			});
+		}
 
 		saveToText();
 		updateCards();
